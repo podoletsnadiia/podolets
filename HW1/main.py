@@ -1,7 +1,7 @@
 
 #Generate 100 random numbers between 0 and 1000
 import random
-list = []
+gen_rand = []
 randomlist = random.sample(range(0, 1000), 100)
 print(randomlist)
 
@@ -43,5 +43,3 @@ def average_lis(): # Create a function
     avg_odd = sum_odd / len(odd) # Calculate the average of odd numbers
     return avg_even, avg_odd
 print('Averages of even and odd numbers:', average_lis())
-
-
