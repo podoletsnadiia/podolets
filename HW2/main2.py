@@ -1,30 +1,40 @@
-# def function(n):
-#     pick = randrange(n)
-#     return {'key %d' % i: ('value1', 'value2')[i == pick] for i in range(n)}
+# import modules
+from collections import defaultdict
+import random
+import string
+
+# Task 1
 
 
+def dicts():
+    my_o = []  # Dicts list
+    for dict_num in range(random.randint(2, 10)):  # Dicts counter
+        dictionary = {}
+        for elem_num in range(random.randint(3, 7)):  # Elements counter
+            dictionary[random.choice(string.ascii_lowercase)] = random.randint(0, 100)  # Key(ran_let), value(ran_num)
+        my_o.append(dictionary)  # Append every dict to dicts list
+    return my_o
+
+# Task 2
 
 
-from random import randint, choice # using the `random` module’s `.choices()` method
-from string import ascii_lowercase
-#
-final_dict, indexes_dict = {}, {}
+output = defaultdict(lambda: float('-inf'))  # To ensure you always get the
+# correct output to include if there are negative
+# values use float('-inf') as the default value
+dicts = dicts()
 
-# rand_list = [{choice(ascii_lowercase): randint(0, 100) for i in range(len(ascii_lowercase))} for j in range(randint(2, 10))]
-#
-# for dictionary in rand_list:
-#     for key, value in dictionary.items():
-#         if key not in final_dict:
-#             final_dict.update({key: value}) # add first occurrence
-#         else:
-#             if value < final_dict.get(key):
-#                 #TODO indexes_dict.update({:})
-#                 continue
-#             else:
-#                 final_dict.update({key: value})
-#                 #TODO indexes_dict.update({:})
-#
-# for key in indexes_dict:
-#     final_dict[key + '_' + str(indexes_dict[key])] = final_dict.pop(key)
+for cntr in range(0, len(dicts)):  # Create a counter for later adding of '_number_of_dictionary' for the same keys
+    for k, v in dicts[cntr].items():
+        if output[k] != float('-inf'):  # Check whether value exists previously
+            if output[k] > v:  # If stored value > actual than we do nothing
+                continue
+            del output[k]  # Delete key with max value
+            k = f'{k}_{cntr + 1}'  # Create new key with adding '_number_of_dictionary'
 
-print(final_dict)
+        output[k] = max(output[k], v)  # Add key: value
+
+
+for i in range(0, len(dicts)):
+    print(f'Dict {i+1}:  {dicts[i]}')  # Just for better display
+print('')
+print('New dictionary:', dict(output))
