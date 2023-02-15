@@ -1,4 +1,4 @@
-#  Generate 100 random numbers between 0 and 1000
+#  generate 100 random numbers between 0 and 1000
 import random
 
 
