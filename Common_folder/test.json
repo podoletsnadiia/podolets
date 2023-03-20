@@ -1,0 +1,15 @@
+{
+  "News": [{
+    "data_type": "News",
+    "text_str": "good food",
+    "city": "Ternofriday"
+  }],
+  "PrivateAd": [{
+    "data_type": "News",
+    "text_str": "bad food"
+  }],
+  "Useful Tips": [{
+    "data_type": "News",
+    "text_str": "newer eat"
+  }]
+}
