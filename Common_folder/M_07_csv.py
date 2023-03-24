@@ -3,9 +3,14 @@ from collections import Counter
 import pandas as pd
 import os
 import pathlib
+import re
+from re import findall
 
 
 PATH = os.path.join(pathlib.Path.cwd(), 'newsfeed.txt')
+
+# words_pattern = '[a-z]+'
+# re.findall(words_pattern, text, flags=re.IGNORECASE)
 
 
 def get_words_letters(path_to_file):
