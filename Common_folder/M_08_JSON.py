@@ -2,20 +2,28 @@ from datetime import datetime
 import os
 import json
 import pathlib
-import M_04_functions as imported_file
+import M_04_functions as Imported_file
 
 PATH = os.path.join(pathlib.Path.cwd(), 'newsfeed.txt')
 
-# with open('my_test.json', 'w') as f:
+# with open('test.json', 'w') as f:
 #     f.write(str(a))
-
 
 # Create parent class with parameters and methods which will be used in every child class
 # The 'body' parameter will be overwritten several times and in the final form
 # will be equal to the value of the entire publication that will be written to the file
 
+class News:
+    def __init__(self):
+        self.format_str = myfunc.myfunc()
+    def create_news(self, title, main_text):
+        city = input('City: ').casefold().capitalize().strip()
+        date_time = datetime.now().strftime("%d/%m/%Y, %H:%M")
+        main_text = "\n".join([main_text, city, date_time])
+        my_news = self.format_str.format_str(title=title, text_body=main_text)
+        return my_news
 
-class Publication:
+class Publication(News):
 
     def __init__(self, data_type, text_str='', body=''):
         self.data_type = data_type
@@ -37,7 +45,7 @@ class Publication:
     # Function that will create a new 'body'(entire publication) for every type of publication
     def publishing(self):
         def p1():
-            return News(data_type=self.data_type, text_str=self.text_str, body=self.body, city=input('City: ')).body
+            return self.create_news(title=self.data_type, main_text=self.text_str)
 
         def p2():
             return PrivateAd(data_type=self.data_type, text_str=self.text_str, body=self.body).body

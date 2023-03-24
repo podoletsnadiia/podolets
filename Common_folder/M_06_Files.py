@@ -1,19 +1,71 @@
 from datetime import datetime
 import os
 import pathlib
-import homework_4_3 as imported_file
+import M_04_functions as Imported_file
+import re
 
 PATH = os.path.join(pathlib.Path.cwd(), 'newsfeed.txt')
 print(PATH)
+
+text_str = """
+<NEWS> 
+<TEXT> First News
+with
+additional
+strings!
+</TEXT>
+<CITY>London</CITY>
+</NEWS>
+
+<PRIVATE AD>
+<TEXT>sdfsdf</TEXT>
+<DATE>23/03/2023</DATE>
+</PRIVATE AD>
+
+<NEWS> 
+<TEXT> Second News
+with
+additional
+strings!
+</TEXT>
+<CITY>London</CITY>
+</NEWS>
+
+<USEFUL TIPS>
+<TEXT>sdfsdf</TEXT>
+<AUTHOR>nadia</AUTHOR>
+</USEFUL TIPS>
+
+"""
+
+# (?:<NEWS>) - начало блока
+# (.*?) - тело блока до конца блока
+# (?:</NEWS>) - конец блока
+# re.DOTALL - параметр позволяет работать с многострочными данными
+
+News = re.findall(r"(?:<NEWS>)(.*?)(?:</NEWS>)", text_str, re.DOTALL)  # for news
+PrivateAd = re.findall(
+    r"(?:<PRIVATE AD>)(.*?)(?:</PRIVATE AD>)", text_str, re.DOTALL
+)  # for AD
+UsefulTips = re.findall(r"(?:<USEFUL TIPS>)(.*?)(?:</USEFUL TIPS>)", text_str, re.DOTALL
+)  # for useful tips
+
+print(News)
+print(PrivateAd)
+print(UsefulTips)
+
+print(*News, sep="\n")  # так можно напечатать список раскрытым
+print(*PrivateAd, sep="\n")
+print(*UsefulTips, sep="\n")
 
 
 # Create parent class with parameters and methods which will be used in every child class
 # The 'body' parameter will be overwritten several times and in the final form
 # will be equal to the value of the entire publication that will be written to the file
 class Publication:
-    def __init__(self, data_type, text, body=''):
+    def __init__(self, data_type, text_str, body=''):
         self.data_type = data_type
-        self.text = text
+        self.text = text_str
         self.body = body
 
     # Function that add body of publication to file
@@ -32,13 +84,13 @@ class Publication:
     # Function that will create a new 'body'(entire publication) for every data_type of publication
     def publishing(self):
         def p1():
-            return News(data_type=self.data_type, text=self.text, body=self.body, city=input('City: ')).body
+            return News(data_type=self.data_type, text=self.text_str, body=self.body, city=input('City: ')).body
 
         def p2():
-            return PrivateAd(data_type=self.data_type, text=self.text, body=self.body).body
+            return PrivateAd(data_type=self.data_type, text=self.text_str, body=self.body).body
 
         def p3():
-            return UsefulTips(data_type=self.data_type, text=self.text, body=self.body, author=input('Author: ')).body
+            return UsefulTips(data_type=self.data_type, text=self.text_str, body=self.body, author=input('Author: ')).body
 
         try:
             # Create a dict where keys are data_types of publications, values are functions created above
@@ -54,21 +106,21 @@ class Publication:
 
 # Child class News with new parameters
 class News(Publication):
-    def __init__(self, text, data_type, city, body, date_time=datetime.now().strftime("%d/%m/%Y, %H:%M")):
+    def __init__(self, text_str, data_type, city, body, date_time=datetime.now().strftime("%d/%m/%Y, %H:%M")):
         # The super() function is used to give access to methods and properties of a parent class.
-        super().__init__(data_type, text, body)
+        super().__init__(data_type, text_str, body)
         self.city = city
         self.date_time = date_time
-        self.body = f'News -------------------------\n{self.text}\n{self.city.casefold().capitalize().strip()},' \
+        self.body = f'News -------------------------\n{self.text_str}\n{self.city.casefold().capitalize().strip()},' \
                     f' {self.date_time}\n------------------------------'
 
 
 # Child class PrivateAd with new parameters
 class PrivateAd(Publication):
-    def __init__(self, data_type, text, body):
-        super().__init__(data_type, text, body)
+    def __init__(self, data_type, text_str, body):
+        super().__init__(data_type, text_str, body)
         self.date_delta = PrivateAd.delta_time()
-        self.body = f'Private Ad -------------------\n{self.text}\nActual until: ' \
+        self.body = f'Private Ad -------------------\n{self.text_str}\nActual until: ' \
                     f'{self.date_delta} days\n------------------------------'
 
     @staticmethod
@@ -94,10 +146,10 @@ class PrivateAd(Publication):
 
 # Child class UsefulTips with new parameters
 class UsefulTips(Publication):
-    def __init__(self, data_type, text, body, author):
-        super().__init__(data_type, text, body)
+    def __init__(self, data_type, text_str, body, author):
+        super().__init__(data_type, text_str, body)
         self.author = author
-        self.body = f'Useful Tips ------------------\n{self.text}\nAuthor: ' \
+        self.body = f'Useful Tips ------------------\n{self.text_str}\nAuthor: ' \
                     f'{self.author.casefold().capitalize().strip()}\n------------------------------'
 
 
