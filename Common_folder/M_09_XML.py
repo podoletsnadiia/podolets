@@ -7,17 +7,8 @@ import M_04_functions as Imported_file
 
 PATH = os.path.join(pathlib.Path.cwd(), 'newsfeed.txt')
 
-class News:
-    def __init__(self):
-        self.format_str = myfunc.myfunc()
-    def create_news(self, title, main_text):
-        city = input('City: ').casefold().capitalize().strip()
-        date_time = datetime.now().strftime("%d/%m/%Y, %H:%M")
-        main_text = "\n".join([main_text, city, date_time])
-        my_news = self.format_str.format_str(title=title, text_body=main_text)
-        return my_news
 
-class Publication(News):
+class Publication:
 
     def __init__(self, data_type, text_str='', body=''):
         self.data_type = data_type
@@ -39,7 +30,7 @@ class Publication(News):
     # Function that will create a new 'body'(entire publication) for every type of publication
     def publishing(self):
         def p1():
-            return self.create_news(title=self.data_type, main_text=self.text_str)
+            return News(data_type=self.data_type, text_str=self.text_str, body=self.body, city=input('City: ')).body
 
         def p2():
             return PrivateAd(data_type=self.data_type, text_str=self.text_str, body=self.body).body
@@ -132,26 +123,68 @@ class PublFromFile:
                 text_body = ''.join(rows_from_file[:int(self.cnt_sent)])
 
             n = text_body
-            result = imported_file.normalization(n)
+            result = Imported_file.normalization(n)
             return result
 
         else:
             raise Exception(f'File {self.filename} not founded')
 
 
-class PublFromJsonFile():
+class PublFromJsonFile:
     def __init__(self, count_elements=0, filename='',
                  path=pathlib.Path.cwd()):
         self.count_elements = count_elements
         self.filename = filename
         self.path = path
 
-    def format_text(self, title, body):
-        pass
+        # Read file
 
-    def body_types(self, f):
-        self.format_text(title="News", body="Hi")
-        pass
+    def read_json(self):
+        if self.filename in os.listdir():
+            def check(self, f):
+                if self.count_elements > len(f):
+                    raise Exception('len file < count elements')
+                else:
+                    return self.count_elements
+
+            def body_data_types(f):
+                output_list = []
+                for i in range(0, self.count_elements):
+                    element = f[i]
+                    if element["data_type"].lower() == 'news':
+                        body = f"News -------------------------\n{element['text_str']}\n{element['City']}, " \
+                               f"{element['Date']}\n------------------------------"
+                        output_list.append(body)
+                    elif element["data_type"].lower() == 'private_ad':
+                        body = f"Private Ad -------------------\n{element['text_str']}\nActual until: " \
+                               f"{element['Date']} days\n------------------------------"
+                        output_list.append(body)
+                    elif element["data_type"].lower() == 'useful_tips':
+                        body = f'Useful Tips ------------------\n{element["text_str"]}\nAuthor: ' \
+                               f'{element["Author"]}\n------------------------------'
+                        output_list.append(body)
+                    else:
+                        raise Exception(f'data_type not founded')
+                return output_list
+
+            f = json.load(open(f'{self.path}/{self.filename}'))
+            check(self, f)
+
+            # Remove file
+            os.remove(self.path + self.filename)
+            print('File successfully deleted ')
+
+            return '\n\n'.join(body_data_types(f))
+
+        else:
+            raise Exception(f'File {self.filename} not founded')
+
+
+class PublFromXMLFile:
+    def __init__(self, count_elements=0, filename='', path=os.path.join(pathlib.Path.cwd())):
+        self.count_elements = count_elements
+        self.filename = filename
+        self.path = path
 
     def read_xml(self):
         def dict_from_xml():
@@ -160,7 +193,7 @@ class PublFromJsonFile():
 
             return data_dict
 
-        def body_types(data_dict):
+        def body_data_types(data_dict):
             output_list = []
             i = 0
             try:
@@ -170,13 +203,13 @@ class PublFromJsonFile():
                         break
 
                     if element["type"].lower() == 'news':
-                        body = f"News -------------------------\n{element['text']}\n{element['city_date']}\n------------------------------"
+                        body = f"News -------------------------\n{element['text_str']}\n{element['city_date']}\n------------------------------"
                         output_list.append(body)
                     elif element["type"].lower() == 'privatead':
-                        body = f"Private Ad -------------------\n{element['text']}\n{element['date']}\n------------------------------"
+                        body = f"Private Ad -------------------\n{element['text_str']}\n{element['date']}\n------------------------------"
                         output_list.append(body)
                     elif element["type"].lower() == 'usefultips':
-                        body = f'Useful Tips ------------------\n{element["text"]}\n{element["author"]}\n------------------------------'
+                        body = f'Useful Tips ------------------\n{element["text_str"]}\n{element["author"]}\n------------------------------'
                         output_list.append(body)
                     else:
                         raise Exception(f'Type not founded')
@@ -189,7 +222,7 @@ class PublFromJsonFile():
                 return output_list
             return output_list
 
-        return '\n\n\n'.join(body_types(dict_from_xml()))
+        return '\n\n\n'.join(body_data_types(dict_from_xml()))
 
 
 if __name__ == '__main__':
@@ -201,16 +234,16 @@ if __name__ == '__main__':
         type_of_file = input('JSON/XML/TXT? ').upper()
         if type_of_file == 'JSON':
             new_object = PublFromJsonFile(int(input('Cnt publications? ')), input('Filename? '))
-            text = new_object.read_json()
-            new_publication_object = Publication('', body=text)
+            text_data = new_object.read_json()
+            new_publication_object = Publication('', body=text_str)
             new_publication_object.write_to_file()
         elif type_of_file == 'XML':
             new_object = PublFromXMLFile(int(input('Cnt publications? ')), input('Filename? '))
-            text = new_object.read_xml()
-            new_publication_object = Publication('', body=text)
+            text_data = new_object.read_xml()
+            new_publication_object = Publication('', body=text_str)
             new_publication_object.write_to_file()
         else:
             new_object = PublFromFile(input('Cnt sentences? '), input('Filename? '))
-            text = new_object.read_file()
-            new_publication_object = Publication(input('Choose what you want to publish (News, Private Ad, Useful Tips): ').upper().strip(), text)
+            text_data = new_object.read_file()
+            new_publication_object = Publication(input('Choose what you want to publish (News, Private Ad, Useful Tips): ').upper().strip(), text_str)
             new_publication_object.publishing()

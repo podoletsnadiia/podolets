@@ -334,52 +334,23 @@ if __name__ == '__main__':
 
         if type_of_file == 'JSON':
             new_object = PublFromJsonFile(int(input('Cnt publications? ')), input('Filename? '))
-            text = new_object.read_json()
-            new_publication_object = Publication('', body=text)
+            text_str = new_object.read_json()
+            new_publication_object = Publication('', body=text_str)
             new_publication_object.write_to_file()
 
         elif type_of_file == 'XML':
             new_object = PublFromXMLFile(int(input('Cnt publications? ')), input('Filename? '))
-            text = new_object.read_xml()
-            new_publication_object = Publication('', body=text)
+            text_str = new_object.read_xml()
+            new_publication_object = Publication('', body=text_str)
             new_publication_object.write_to_file()
 
         else:
             new_object = PublFromFile(input('Cnt sentences? '), input('Filename? '))
-            text = new_object.read_file()
-            new_publication_object = Publication(input('Choose what you want to publish (News, Private Ad, Useful Tips): ').upper().strip(), text)
+            text_str = new_object.read_file()
+            new_publication_object = Publication(input('Choose what you want to publish (News, Private Ad, Useful Tips): ').upper().strip(), text_str)
             new_publication_object.publishing()
-# connection = sqlite3.connect('test.db')
-# cursor = connection.cursor()
-#
-# # cursor.execute('CREATE TABLE people (first_name text, last_name text, age real)')
-# cursor.execute("INSERT INTO people VALUES ('Nadia', 'Podolets', 25)")
-# cursor.execute("INSERT INTO people VALUES ('Max', 'Major', 14)")
-#
-# connection.commit()
-#
-# cursor.execute('select * from people')
-#
-# result = cursor.fetchall()
-# print(result)
-#
-# cursor.close()
-# connection.close()
 
 
 
-# connection = pyodbc.connect('DRIVER={SQLite3 ODBC Driver};'
-#                             'Direct=True;'
-#                             'Database=test.db;'
-#                             'String Types= Unicode', autocommit=True)
-#
-# cursor = connection.cursor()
-#
-# cursor.execute('select * from people')
-#
-# print(cursor.description)
-#
-# result = cursor.fetchall()
-# print(result[1].age)
 
 
