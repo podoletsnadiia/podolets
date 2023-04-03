@@ -13,15 +13,18 @@ PATH = os.path.join(pathlib.Path.cwd(), 'newsfeed.txt')
 # The 'body' parameter will be overwritten several times and in the final form
 # will be equal to the value of the entire publication that will be written to the file
 
+
 class News:
     def __init__(self):
         self.format_str = myfunc.myfunc()
+
     def create_news(self, title, main_text):
         city = input('City: ').casefold().capitalize().strip()
         date_time = datetime.now().strftime("%d/%m/%Y, %H:%M")
         main_text = "\n".join([main_text, city, date_time])
         my_news = self.format_str.format_str(title=title, text_body=main_text)
         return my_news
+
 
 class Publication(News):
 
@@ -35,6 +38,7 @@ class Publication(News):
         print(f'\nINFO. NewPublicationObject:\n{self.body}')
         try:
             with open(PATH, 'w') as f:
+            # with open(os.path.join(self.path, self.filename), 'w') as f:
                 f.write(self.body + '\n\n\n')
             print('INFO. Successful. New publication added.')
             return True
@@ -123,7 +127,8 @@ class PublFromFile:
     def read_file(self):
         # Read file
         if self.filename in os.listdir():
-            with open(self.path + self.filename, 'r') as f:
+            # with open(self.path + self.filename), 'r') as f:
+            with open(os.path.join(self.path, self.filename), 'r') as f:
                 rows_from_file = [str(i) for i in f.readlines()]
                 print('Lines successfully read')
 
@@ -189,8 +194,11 @@ class PublFromJsonFile():
 
             def body_types(f):
                 output_list = []
+
+
+
                 for i in range(0, self.count_elements):
-                    element = f[i]
+                    # element = f[i]
                     if element["Type"].lower() == 'news':
                         body = f"News -------------------------\n{element['Text']}\n{element['City']},\
 {element['Date']}\n------------------------------"
@@ -210,13 +218,47 @@ class PublFromJsonFile():
             f = json.load(open(os.path.join(self.path, self.filename)))
             if self.count_elements > len(f):
                 raise Exception('len file < count elements')
-            else:
-                return self.count_elements
+            # else:
+            #     return self.count_elements
 
             # Remove file
-            os.remove(os.path.join(self.path, self.filename))
+            # os.remove(os.path.join(self.path, self.filename))
             print('File successfully deleted ')
+            output_list = []
+            if f['News']:
+                element = f['News']
+                if type(f['News']) is not list:
+                    element = [element]
+                for i in element:
+                    text_str = i['text_str']
+                    city = i['city']
+                    body = f'News -------------------------\n{text_str}\n{city},\
+                    {datetime.now().strftime("%d/%m/%Y, %H:%M")}\n------------------------------'
+                    print(body)
+                    output_list.append(body)
+            elif f['PrivateAd']:
+                element = f['PrivateAd']
+                if type(f['PrivateAd']) is not list:
+                    element = [element]
+                for i in element:
+                    text_str = i['text_str']
+                    body = f'PrivateAd -------------------------\n{text_str},\
+                    {datetime.now().strftime("%d/%m/%Y, %H:%M")}\n------------------------------'
+                    print(body)
+                    output_list.append(body)
+            elif f['UsefulTips']:
+                element = f['UsefulTips']
+                if type(f['UsefulTips']) is not list:
+                    element = [element]
+                for i in element:
+                    text_str = i['text_str']
+                    body = f'UsefulTips -------------------------\n{text_str},\
+                    {datetime.now().strftime("%d/%m/%Y, %H:%M")}\n------------------------------'
+                    print(body)
+                    output_list.append(body)
 
+
+            # str_fin = body_types(f)
             return '\n\n'.join(self.body_types(f))
 
         else:
