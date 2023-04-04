@@ -1,6 +1,6 @@
 from datetime import datetime
 import os
-import xml
+import xml.etree.ElementTree as ET
 import json
 import pathlib
 import M_04_functions as Imported_file
@@ -19,7 +19,7 @@ class Publication:
     def write_to_file(self):
         print(f'\nINFO. NewPublicationObject:\n{self.body}')
         try:
-            with open(PATH, 'w') as f:
+            with open(PATH, 'a') as f:
                 f.write(self.body + '\n\n\n')
             print('INFO. Successful. New publication added.')
             return True
@@ -108,7 +108,8 @@ class PublFromFile:
     def read_file(self):
         # Read file
         if self.filename in os.listdir():
-            with open(self.path + self.filename, 'r') as f:
+            # with open(self.path + self.filename, 'r') as f:
+            with open(os.path.join(self.path, self.filename), 'r') as f:
                 rows_from_file = [str(i) for i in f.readlines()]
                 print('Lines successfully read')
 
@@ -187,42 +188,62 @@ class PublFromXMLFile:
         self.path = path
 
     def read_xml(self):
-        def dict_from_xml():
-            with open(self.path + self.filename) as xml_file:
-                data_dict = xmltodict.parse(xml_file.read())
+        data_dict = ET.parse(os.path.join(self.path, self.filename))
 
-            return data_dict
+        root = data_dict.getroot()
+        output_list = []
+        i = 0
+        try:
+            for element in root.iter('News'):
+                text_list = ["News", "", ""]
+                for text in element:
+                    if text.tag == "text_data":
+                        text_list[1] = text.text
+                    elif text.tag == 'city':
+                        text_list[2] = text.text
+                body = f"News -------------------------\n{text_list[1]}\n{text_list[2]}\n------------------------------"
+                output_list.append(body)
+            for element in root.iter('PrivateAd'):
+                text_list = ["PrivateAd", ""]
+                for text in element:
+                    if text.tag == "text_data":
+                        text_list[1] = text.text
+                body = f"PrivateAd -------------------------\n{text_list[1]}\n------------------------------"
+                output_list.append(body)
+            for element in root.iter('Useful_Tips'):
+                text_list = ["Useful_Tips", "", ""]
+                for text in element:
+                    if text.tag == "text_data":
+                        text_list[1] = text.text
+                    elif text.tag == 'author':
+                        text_list[2] = text.text
+                body = f"Useful_Tips -------------------------\n{text_list[1]}\n{text_list[2]}\n------------------------------"
+                output_list.append(body)
 
-        def body_data_types(data_dict):
-            output_list = []
-            i = 0
-            try:
-                for element in data_dict['publication_from_xml']['publication']:
-                    i += 1
-                    if i > self.count_elements:
-                        break
+                #     i += 1
+                #     if i > self.count_elements:
+                #         break
+                #
+                #     if element["type"].lower() == 'news':
+                #         body = f"News -------------------------\n{element['text_str']}\n{element['city_date']}\n------------------------------"
+                #         output_list.append(body)
+                #     elif element["type"].lower() == 'privatead':
+                #         body = f"Private Ad -------------------\n{element['text_str']}\n{element['date']}\n------------------------------"
+                #         output_list.append(body)
+                #     elif element["type"].lower() == 'usefultips':
+                #         body = f'Useful Tips ------------------\n{element["text_str"]}\n{element["author"]}\n------------------------------'
+                #         output_list.append(body)
+                #     else:
+                #         raise Exception(f'Type not founded')
+                #
+                # # Remove file
+                # os.remove(self.path + self.filename)
+            print(output_list)
+            print('File successfully deleted ')
+        except Exception as e:
+            print(f'Error: {e}')
 
-                    if element["type"].lower() == 'news':
-                        body = f"News -------------------------\n{element['text_str']}\n{element['city_date']}\n------------------------------"
-                        output_list.append(body)
-                    elif element["type"].lower() == 'privatead':
-                        body = f"Private Ad -------------------\n{element['text_str']}\n{element['date']}\n------------------------------"
-                        output_list.append(body)
-                    elif element["type"].lower() == 'usefultips':
-                        body = f'Useful Tips ------------------\n{element["text_str"]}\n{element["author"]}\n------------------------------'
-                        output_list.append(body)
-                    else:
-                        raise Exception(f'Type not founded')
-
-                # Remove file
-                os.remove(self.path + self.filename)
-                print('File successfully deleted ')
-            except Exception as e:
-                print(f'Error: {e}')
-                return output_list
-            return output_list
-
-        return '\n\n\n'.join(body_data_types(dict_from_xml()))
+        return '\n\n\n'.join(output_list)
 
 
 if __name__ == '__main__':
@@ -234,16 +255,16 @@ if __name__ == '__main__':
         type_of_file = input('JSON/XML/TXT? ').upper()
         if type_of_file == 'JSON':
             new_object = PublFromJsonFile(int(input('Cnt publications? ')), input('Filename? '))
-            text_data = new_object.read_json()
+            text_str = new_object.read_json()
             new_publication_object = Publication('', body=text_str)
             new_publication_object.write_to_file()
         elif type_of_file == 'XML':
             new_object = PublFromXMLFile(int(input('Cnt publications? ')), input('Filename? '))
-            text_data = new_object.read_xml()
+            text_str = new_object.read_xml()
             new_publication_object = Publication('', body=text_str)
             new_publication_object.write_to_file()
         else:
             new_object = PublFromFile(input('Cnt sentences? '), input('Filename? '))
-            text_data = new_object.read_file()
+            text_str = new_object.read_file()
             new_publication_object = Publication(input('Choose what you want to publish (News, Private Ad, Useful Tips): ').upper().strip(), text_str)
             new_publication_object.publishing()
