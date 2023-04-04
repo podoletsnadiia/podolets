@@ -37,7 +37,7 @@ class Publication(News):
     def write_to_file(self):
         print(f'\nINFO. NewPublicationObject:\n{self.body}')
         try:
-            with open(PATH, 'w') as f:
+            with open(PATH, 'a') as f:
             # with open(os.path.join(self.path, self.filename), 'w') as f:
                 f.write(self.body + '\n\n\n')
             print('INFO. Successful. New publication added.')
@@ -236,7 +236,7 @@ class PublFromJsonFile():
                     {datetime.now().strftime("%d/%m/%Y, %H:%M")}\n------------------------------'
                     print(body)
                     output_list.append(body)
-            elif f['PrivateAd']:
+            if f['PrivateAd']:
                 element = f['PrivateAd']
                 if type(f['PrivateAd']) is not list:
                     element = [element]
@@ -246,7 +246,7 @@ class PublFromJsonFile():
                     {datetime.now().strftime("%d/%m/%Y, %H:%M")}\n------------------------------'
                     print(body)
                     output_list.append(body)
-            elif f['UsefulTips']:
+            if f['UsefulTips']:
                 element = f['UsefulTips']
                 if type(f['UsefulTips']) is not list:
                     element = [element]
@@ -257,9 +257,8 @@ class PublFromJsonFile():
                     print(body)
                     output_list.append(body)
 
-
             # str_fin = body_types(f)
-            return '\n\n'.join(self.body_types(f))
+            return '\n\n'.join(output_list)
 
         else:
             raise Exception(f'File {self.filename} not founded')
